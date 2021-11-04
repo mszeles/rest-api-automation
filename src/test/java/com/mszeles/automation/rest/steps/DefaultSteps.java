@@ -7,10 +7,12 @@
 package com.mszeles.automation.rest.steps;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Paths;
+import java.util.Properties;
 
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
@@ -28,7 +30,7 @@ public class DefaultSteps {
 		LOG_FILE.getParentFile().mkdirs();
 		LOG_FILE.createNewFile();
 		PrintStream logStream = new PrintStream(new FileOutputStream(LOG_FILE, true));
-		return new RequestSpecBuilder().setBaseUri("https://rahulshettyacademy.com")
+		return new RequestSpecBuilder().setBaseUri(getGlobalValue("baseUrl"))
 				.addFilter(RequestLoggingFilter.logRequestTo(logStream))
 				.addFilter(ResponseLoggingFilter.logResponseTo(logStream))
 				.setContentType(ContentType.JSON).addQueryParam("key", "qaclick123").build();
@@ -37,6 +39,13 @@ public class DefaultSteps {
 	public static ResponseSpecification responseSpecification() {
 		return new ResponseSpecBuilder()
 				.expectContentType(ContentType.JSON).build();
+	}
+
+	public static String getGlobalValue(String key) throws IOException {
+		Properties prop = new Properties();
+		FileInputStream fis = new FileInputStream(Paths.get(System.getProperty("user.dir"), "src", "test", "resources", "global.properties").toFile());
+		prop.load(fis);
+		return prop.getProperty(key);
 	}
 
 }
