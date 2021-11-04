@@ -19,6 +19,7 @@
 @api
 Feature: Validating Place APIs
 
+	@AddPlace
   Scenario Outline: Verify if place is being successfully added using AddPlaceAPI 
     Given add place payload with "<name>" "<language>" "<address>"
     When user calls "ADD_PLACE" with "POST" http request
@@ -33,6 +34,7 @@ Feature: Validating Place APIs
   Scenario: Verify if place is being successfully deleted using DeletePlaceAPI 
     Given add place payload with "AAA" "Hungarian" "Some address"
     And user calls "ADD_PLACE" with "POST" http request
+    And delete place payload
     When user calls "DELETE_PLACE" with "DELETE" http request
     Then the API call is success with status code 200
     And place does not exist anymore

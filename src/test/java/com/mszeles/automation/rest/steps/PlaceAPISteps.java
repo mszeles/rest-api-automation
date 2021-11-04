@@ -8,18 +8,19 @@ import java.io.IOException;
 import com.mszeles.automation.rest.MapAPIUrl;
 import com.mszeles.automation.rest.TestDataBuild;
 import com.mszeles.automation.rest.dao.place.AddPlace;
+import com.mszeles.automation.rest.dao.place.DeletePlace;
 
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.http.Method;
-import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 
 public class PlaceAPISteps extends DefaultSteps {
 
 	private Response response;
 	private AddPlace addPlace;
+	private DeletePlace deletePlace;
 	private String placeId;
 
 	@Given("add place payload with {string} {string} {string}")
@@ -33,8 +34,7 @@ public class PlaceAPISteps extends DefaultSteps {
 			response = given().spec(requestSpecification()).body(addPlace)
 					.when().post(MapAPIUrl.valueOf(apiMethod).getUrl())
 					.then().spec(responseSpecification()).extract().response();
-			JsonPath js = new JsonPath(response.asString());
-			placeId = js.get("place_id");
+			placeId = getJsonValue(response.asString(), "place_id");
 			return;
 		}
 		else if (Method.GET.toString().equalsIgnoreCase(requestType)) {
@@ -44,7 +44,7 @@ public class PlaceAPISteps extends DefaultSteps {
 			return;
 		}
 		else if (Method.DELETE.toString().equalsIgnoreCase(requestType)) {
-			response = given().spec(requestSpecification()).body(TestDataBuild.getDeletPlacePayload(placeId))
+			response = given().spec(requestSpecification()).body(deletePlace)
 					.when().post(MapAPIUrl.valueOf(apiMethod).getUrl())
 					.then().spec(responseSpecification()).extract().response();
 			return;
@@ -66,9 +66,12 @@ public class PlaceAPISteps extends DefaultSteps {
 	@Then("{string} in response body is {string}")
 	public void in_response_body_is(String keyValue, String value) {
 		String responseString = response.asString();
-		JsonPath js = new JsonPath(responseString);
-		String actualValue = js.get(keyValue);
-		assertEquals(value, actualValue);
+		assertEquals(value, getJsonValue(responseString, keyValue));
+	}
+
+	@Given("delete place payload")
+	public void delete_place_payload() {
+		deletePlace = TestDataBuild.getDeletPlacePayload(placeId);
 	}
 
 	@Then("place does not exist anymore")

@@ -19,6 +19,7 @@ import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.http.ContentType;
+import io.restassured.path.json.JsonPath;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
 
@@ -49,6 +50,11 @@ public class DefaultSteps {
 		FileInputStream fis = new FileInputStream(Paths.get(System.getProperty("user.dir"), "src", "test", "resources", "global.properties").toFile());
 		prop.load(fis);
 		return prop.getProperty(key);
+	}
+
+	public static String getJsonValue(String jsonString, String path) {
+		JsonPath js = new JsonPath(jsonString);
+		return js.get(path).toString();
 	}
 
 }
