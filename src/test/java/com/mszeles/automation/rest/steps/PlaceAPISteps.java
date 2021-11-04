@@ -20,9 +20,9 @@ public class PlaceAPISteps extends DefaultSteps {
 	private Response response;
 	private AddPlace addLocation;
 
-	@Given("add place payload")
-	public void add_place_payload() {
-		addLocation = TestDataBuild.getAddPlacePayload();
+	@Given("add place payload with {string} {string} {string}")
+	public void add_place_payload(String name, String language, String address) {
+		addLocation = TestDataBuild.getAddPlacePayload(name, language, address);
 	}
 
 	@When("user calls {string} with {string} http request")
