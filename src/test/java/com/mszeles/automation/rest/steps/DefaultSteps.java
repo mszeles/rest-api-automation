@@ -25,15 +25,18 @@ import io.restassured.specification.ResponseSpecification;
 public class DefaultSteps {
 
 	private static final File LOG_FILE = Paths.get(System.getProperty("user.dir"), "target", "log", "requestlog.txt").toFile();
+	private static RequestSpecification requestSpecification;
 
 	public static RequestSpecification requestSpecification() throws IOException {
-		LOG_FILE.getParentFile().mkdirs();
-		LOG_FILE.createNewFile();
-		PrintStream logStream = new PrintStream(new FileOutputStream(LOG_FILE, true));
-		return new RequestSpecBuilder().setBaseUri(getGlobalValue("baseUrl"))
-				.addFilter(RequestLoggingFilter.logRequestTo(logStream))
-				.addFilter(ResponseLoggingFilter.logResponseTo(logStream))
-				.setContentType(ContentType.JSON).addQueryParam("key", "qaclick123").build();
+		if (requestSpecification == null) {
+			LOG_FILE.getParentFile().mkdirs();
+			PrintStream logStream = new PrintStream(new FileOutputStream(LOG_FILE));
+			requestSpecification = new RequestSpecBuilder().setBaseUri(getGlobalValue("baseUrl"))
+					.addFilter(RequestLoggingFilter.logRequestTo(logStream))
+					.addFilter(ResponseLoggingFilter.logResponseTo(logStream))
+					.setContentType(ContentType.JSON).addQueryParam("key", "qaclick123").build();
+		}
+		return requestSpecification;
 	}
 
 	public static ResponseSpecification responseSpecification() {
